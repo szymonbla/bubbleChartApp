@@ -66,15 +66,15 @@ export const ScatterChart = ({
 
       // Axises
 
-      const xAxis = d3
-        .scaleLinear()
-        .domain([minPopulation().min, minPopulation().max])
-        .range([0, width]);
-
       const yAxis = d3
         .scaleLinear()
-        .domain([calcCases().min.TotalCases, calcCases().max.TotalCases])
+        .domain([minPopulation().min, minPopulation().max])
         .range([height, 0]);
+
+      const xAxis = d3
+        .scaleLinear()
+        .domain([calcCases().min.TotalCases, calcCases().max.TotalCases])
+        .range([0, width]);
 
       const zAxis = d3
         .scaleLinear()
@@ -82,13 +82,12 @@ export const ScatterChart = ({
           calcTotalDeaths().min.TotalDeaths,
           calcTotalDeaths().max.TotalDeaths,
         ])
-        .range([1, 100]);
+        .range([1, 50]);
 
       svg
         .append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(xAxis))
-        .style("margin-top", "1em")
         .style("font-size", "18px")
         .selectAll("text")
         .attr("y", 0)
@@ -104,14 +103,14 @@ export const ScatterChart = ({
         .append("text")
         .attr("x", width / 2)
         .attr("y", height + 100)
-        .text("Population")
+        .text("Total cases")
         .style("font-size", "20px");
 
       svg
         .append("text")
         .attr("y", -140)
         .attr("x", -(height / 2))
-        .text("Total cases")
+        .text("Population")
         .style("transform", "rotate(-90deg)")
         .style("font-size", "20px");
 
