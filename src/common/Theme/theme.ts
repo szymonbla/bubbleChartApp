@@ -1,47 +1,42 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from '@mui/material/styles';
 
 const customHeaderFontSize = (fontSize: number) => ({
   fontSize,
-  lineHeight: 1.1,
+  lineHeight: 1.1
 });
 
 const customBodyFontSize = (fontSize: number) => ({
   fontSize,
-  lineHeight: 1.4,
+  lineHeight: 1.4
 });
 
 const theme = createTheme({
   palette: {
     common: {
-      black: "#1A1A1A",
-      white: "#FFFFFF",
+      black: '#1A1A1A',
+      white: '#FFFFFF'
     },
     info: {
-      main: "#006ED4",
+      main: '#006ED4'
     },
     warning: {
-      main: "#F98600",
+      main: '#F98600'
     },
     success: {
-      main: "#008929",
+      main: '#008929'
     },
     error: {
-      main: "#DA0027",
+      main: '#DA0027'
     },
     grey: {
-      800: "#454749",
-      600: "#838890",
-      400: "#CBCFDA",
-      200: "#EFF2F5",
-    },
+      800: '#454749',
+      600: '#838890',
+      400: '#CBCFDA',
+      200: '#EFF2F5'
+    }
   },
   typography: {
-    fontFamily: [
-      "Roboto Condensed",
-      "Helvetica",
-      '"Open Sans"',
-      "sans-serif",
-    ].join(","),
+    fontFamily: ['Roboto Condensed', 'Helvetica', '"Open Sans"', 'sans-serif'].join(','),
     h1: customHeaderFontSize(56),
     h2: customHeaderFontSize(48),
     h3: customHeaderFontSize(40),
@@ -53,9 +48,9 @@ const theme = createTheme({
     subtitle2: customBodyFontSize(18),
 
     body1: customBodyFontSize(16),
-    body2: customBodyFontSize(14),
+    body2: customBodyFontSize(14)
   },
-  spacing: (factor: number) => `${0.5 * factor}rem`,
+  spacing: (factor: number) => `${0.5 * factor}rem`
 });
 
 export default theme;

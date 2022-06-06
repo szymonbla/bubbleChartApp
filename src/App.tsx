@@ -1,6 +1,6 @@
-import { HomePage } from "pages/HomePage";
-import { ThemeProvider } from "@mui/material/styles";
-import theme from "common/Theme";
+import { HomePage } from 'pages/HomePage';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from 'common/Theme';
 
 function App() {
   return (
