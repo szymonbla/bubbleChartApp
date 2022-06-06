@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 
-import { ScatterChart } from 'common/components';
+import { ScatterChart, ChartLegend } from 'common/components';
 import { axiosRequest } from 'common/utils';
 import { allContinents } from 'common/constants';
 
 export const HomePage = () => {
+  const [requestContinent, setRequestContinent] = useState(allContinents[2]);
   const [dataCovid, setDataCovid] = useState([]);
 
   const isMounted = useRef<boolean>();
-
-  const [requestContinent, setRequestContinent] = useState(allContinents[2]);
 
   const changeContinentData = useCallback(async () => {
     const responseArray = await axiosRequest.get(`npm-covid-data/${requestContinent.name}`);
@@ -35,39 +34,11 @@ export const HomePage = () => {
   }, [changeContinentData, requestContinent, setDataCovid]);
 
   return (
-    <Box component="main" sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          justifyContent: 'center',
-          alignContent: 'center',
-          flexWrap: 'wrap',
-          gap: 4
-        }}
-      >
-        {allContinents.map(({ name, id }) => (
-          <Button
-            sx={{
-              backgroundColor: 'info.main',
-              color: 'common.white',
-              fontSize: '16px',
-              fontWeight: '600',
-              width: '200px',
-              '&:hover': {
-                backgroundColor: 'info.main'
-              }
-            }}
-            onClick={() => {
-              setRequestContinent({ id, name });
-              changeContinentData();
-            }}
-            key={name}
-          >
-            {name}
-          </Button>
-        ))}
-      </Box>
+    <Box
+      component="main"
+      sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pb: '10%' }}
+    >
+      <ChartLegend />
       <ScatterChart dataCovid={dataCovid} width={900} height={700} continent={requestContinent} />
     </Box>
   );
