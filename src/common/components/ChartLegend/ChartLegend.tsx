@@ -1,7 +1,16 @@
-import { Box, Button, Typography } from '@mui/material';
-import { allContinents } from 'common/constants';
+import { Dispatch } from 'react';
 
-export const ChartLegend = () => {
+import { Box, Typography } from '@mui/material';
+
+import { allContinents } from 'common/constants';
+import { ChartButton } from './ChartButton';
+
+interface ChartLegendProps {
+  inactiveContinents: string[];
+  setInactiveContinents: Dispatch<React.SetStateAction<string[]>>;
+}
+
+export const ChartLegend = ({ inactiveContinents, setInactiveContinents }: ChartLegendProps) => {
   return (
     <Box
       sx={{
@@ -25,22 +34,13 @@ export const ChartLegend = () => {
         <b>Axis X</b> - Total cases <br></br> <b>Axis Y</b> - Population <br></br> <b>Axis Z</b> - Death Cases
       </Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4 }}>
-        {allContinents.map(({ name, id }) => (
-          <Button
-            sx={{
-              backgroundColor: 'info.main',
-              color: 'common.white',
-              fontSize: '16px',
-              fontWeight: '600',
-              width: '200px',
-              '&:hover': {
-                backgroundColor: 'info.main'
-              }
-            }}
+        {allContinents.map(({ label, id }) => (
+          <ChartButton
             key={id}
-          >
-            {name}
-          </Button>
+            label={label}
+            inactiveContinents={inactiveContinents}
+            setInactiveContinents={setInactiveContinents}
+          />
         ))}
       </Box>
     </Box>

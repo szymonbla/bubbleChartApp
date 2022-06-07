@@ -7,39 +7,40 @@ import { axiosRequest } from 'common/utils';
 import { allContinents } from 'common/constants';
 
 export const HomePage = () => {
-  const [requestContinent, setRequestContinent] = useState(allContinents[2]);
-  const [dataCovid, setDataCovid] = useState([]);
-
+  const [inactiveContinents, setInactiveContinents] = useState<string[]>([]);
+  const [dataCovid, setDataCovid] = useState<any>([]);
   const isMounted = useRef<boolean>();
 
   const changeContinentData = useCallback(async () => {
-    const responseArray = await axiosRequest.get(`npm-covid-data/${requestContinent.name}`);
-    setDataCovid(responseArray.data);
-
-    return responseArray;
-  }, [requestContinent]);
+    allContinents.forEach(async (continent) => {
+      const { data } = await axiosRequest.get(`npm-covid-data/${continent.endpointName}`);
+      setDataCovid((prevState: any) => [...prevState, ...data]);
+    });
+  }, []);
 
   useEffect(() => {
     if (isMounted.current) return;
+
     async function fetchAllArray() {
       try {
         await changeContinentData();
       } catch (err) {
-        throw new Error('test');
+        throw new Error('Something went wrong!');
       }
     }
 
     fetchAllArray();
+
     isMounted.current = true;
-  }, [changeContinentData, requestContinent, setDataCovid]);
+  }, [changeContinentData, setDataCovid]);
 
   return (
     <Box
       component="main"
       sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pb: '10%' }}
     >
-      <ChartLegend />
-      <ScatterChart dataCovid={dataCovid} width={900} height={700} continent={requestContinent} />
+      <ChartLegend inactiveContinents={inactiveContinents} setInactiveContinents={setInactiveContinents} />
+      <ScatterChart dataCovid={dataCovid} width={900} height={700} inactiveContinent={inactiveContinents} />
     </Box>
   );
 };

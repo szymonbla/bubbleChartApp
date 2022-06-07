@@ -1,26 +1,32 @@
 export const allContinents = [
   {
     id: 0,
-    name: 'asia'
+    endpointName: 'asia',
+    label: 'Asia'
   },
   {
     id: 1,
-    name: 'africa'
+    endpointName: 'africa',
+    label: 'Africa'
   },
   {
     id: 2,
-    name: 'europe'
+    endpointName: 'europe',
+    label: 'Europe'
   },
   {
     id: 3,
-    name: 'northamerica'
+    endpointName: 'northamerica',
+    label: 'North America'
   },
   {
     id: 4,
-    name: 'southamerica'
+    endpointName: 'southamerica',
+    label: 'South America'
   },
   {
     id: 5,
-    name: 'australia'
+    endpointName: 'australia',
+    label: 'Australia/Oceania'
   }
 ];
