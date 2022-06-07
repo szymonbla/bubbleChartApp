@@ -1,4 +1,4 @@
-import { useRef, useEffect, LegacyRef, useCallback } from 'react';
+import { useRef, useEffect, LegacyRef, useCallback, useState } from 'react';
 
 import { Box } from '@mui/material';
 import * as d3 from 'd3';
@@ -8,20 +8,19 @@ interface DataResponse {
   Population: number;
   TotalCases: number;
   TotalDeaths: number;
+  Continent: string;
 }
 
 interface ScatterChartProps {
-  dataCovid: DataResponse[];
   width: number;
   height: number;
-  continent: {
-    id: number;
-    name: string;
-  };
+  dataCovid: DataResponse[];
+  inactiveContinent: string[];
 }
 
-export const ScatterChart = ({ dataCovid, height, width, continent }: ScatterChartProps) => {
+export const ScatterChart = ({ dataCovid, height, width, inactiveContinent }: ScatterChartProps) => {
   const svgRef = useRef<LegacyRef<SVGSVGElement>>();
+  const [id, setId] = useState<number>(1);
 
   const drawScatterChart = useCallback(
     (data: DataResponse[]) => {
@@ -134,18 +133,20 @@ export const ScatterChart = ({ dataCovid, height, width, continent }: ScatterCha
         .attr('cx', (d) => Math.abs(xAxis(d.TotalCases)))
         .attr('cy', (d) => yAxis(d.Population))
         .attr('r', (d) => Math.abs(zAxis(d.TotalDeaths)))
-        .style('fill', () => `#${Math.floor(Math.random() * 16777215).toString(16)}`)
+        .style('fill', (d) => (inactiveContinent.includes(d.Continent) ? '#CBCFD' : `#f3f343`))
+        // .style('fill', () => `#${Math.floor(Math.random() * 16777215).toString(16)}`)
         .style('opacity', '1')
         .on('mouseover', showTooltip)
         .on('mousemove', moveTooltip)
         .on('mouseleave', hideTooltip);
     },
-    [width, height, dataCovid]
+    [width, height, dataCovid, inactiveContinent]
   );
 
   useEffect(() => {
     if (dataCovid.length !== 0) drawScatterChart(dataCovid);
-  }, [dataCovid, drawScatterChart, height, width]);
+    setId(id + 1);
+  }, [dataCovid, drawScatterChart, id]);
 
   return (
     <Box
@@ -157,7 +158,7 @@ export const ScatterChart = ({ dataCovid, height, width, continent }: ScatterCha
         alignItems: 'center'
       }}
     >
-      <svg ref={svgRef as LegacyRef<SVGSVGElement>} key={continent.id}></svg>
+      <svg ref={svgRef as LegacyRef<SVGSVGElement>} key={id}></svg>
     </Box>
   );
 };
