@@ -1,4 +1,4 @@
-import { useRef, useEffect, LegacyRef, useCallback, useState, Dispatch } from 'react';
+import { useRef, useEffect, LegacyRef, useState } from 'react';
 
 import { Box } from '@mui/material';
 import * as d3 from 'd3';
@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useCurrentCountry } from 'state';
 
 interface DataResponse {
-  Id: number;
+  Id?: number;
   Country: string;
   Population: number;
   TotalCases: number;
@@ -21,140 +21,138 @@ interface ScatterChartProps {
   height: number;
   dataCovid: DataResponse[];
   inactiveContinent: string[];
-  setCurrentCountry: Dispatch<React.SetStateAction<string>>;
+  currentCountryRef: React.MutableRefObject<DataResponse>;
 }
 
-export const ScatterChart = ({ dataCovid, height, width, inactiveContinent, setCurrentCountry }: ScatterChartProps) => {
-  const svgRef = useRef<LegacyRef<SVGSVGElement>>();
-  const { updateCurrentCountry, Population } = useCurrentCountry();
+export const ScatterChart = ({ dataCovid, height, width, inactiveContinent, currentCountryRef }: ScatterChartProps) => {
+  const svgRef = useRef<LegacyRef<SVGSVGElement>>('');
 
-  const drawScatterChart = useCallback(
-    (data: DataResponse[]) => {
-      const minPopulation = () => {
-        const newArra = dataCovid.sort((a, b) => Number(a.Population) - Number(b.Population));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const drawScatterChart = (data: DataResponse[]) => {
+    const svg = d3
+      .select(svgRef.current as unknown as SVGSVGElement)
+      .attr('width', width)
+      .attr('height', height)
+      .style('overflow', 'visible');
 
-        return {
-          min: newArra[0].Population,
-          max: newArra[newArra.length - 1].Population
-        };
+    const minPopulation = () => {
+      const newArra = dataCovid.sort((a, b) => Number(a.Population) - Number(b.Population));
+
+      return {
+        min: newArra[0].Population,
+        max: newArra[newArra.length - 1].Population
       };
+    };
 
-      const calcCases = () => {
-        const newArra = dataCovid.sort((a, b) => a.TotalCases - b.TotalCases);
-        return {
-          min: newArra[0],
-          max: newArra[newArra.length - 1]
-        };
+    const calcCases = () => {
+      const newArra = dataCovid.sort((a, b) => a.TotalCases - b.TotalCases);
+      return {
+        min: newArra[0],
+        max: newArra[newArra.length - 1]
       };
+    };
 
-      const calcTotalDeaths = () => {
-        const newArra = dataCovid.sort((a, b) => a.TotalDeaths - b.TotalDeaths);
-        return {
-          min: newArra[0],
-          max: newArra[newArra.length - 1]
-        };
+    const calcTotalDeaths = () => {
+      const newArra = dataCovid.sort((a, b) => a.TotalDeaths - b.TotalDeaths);
+      return {
+        min: newArra[0],
+        max: newArra[newArra.length - 1]
       };
+    };
 
-      // Container
-      const svg = d3
-        .select(svgRef.current as unknown as SVGSVGElement)
-        .attr('width', width)
-        .attr('height', height)
-        .style('overflow', 'visible');
+    // Container
 
-      // Axises
+    const showCurrentCountryData = (
+      event: any,
+      { Continent, Country, Population, TotalCases, TotalDeaths, TotalTests }: DataResponse
+    ) => {
+      return (currentCountryRef.current = { Continent, Country, Population, TotalCases, TotalDeaths, TotalTests });
+    };
 
-      const yAxis = d3.scaleLinear().domain([minPopulation().min, minPopulation().max]).range([height, 0]);
+    // Axises
 
-      const xAxis = d3.scaleLinear().domain([calcCases().min.TotalCases, calcCases().max.TotalCases]).range([0, width]);
+    const yAxis = d3.scaleLinear().domain([minPopulation().min, minPopulation().max]).range([height, 0]);
 
-      const zAxis = d3
-        .scaleLinear()
-        .domain([calcTotalDeaths().min.TotalDeaths, calcTotalDeaths().max.TotalDeaths])
-        .range([1, 70]);
+    const xAxis = d3.scaleLinear().domain([calcCases().min.TotalCases, calcCases().max.TotalCases]).range([0, width]);
 
-      svg
-        .append('g')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(xAxis))
-        .style('font-size', '18px')
-        .selectAll('text')
-        .attr('y', 0)
-        .attr('x', 9)
-        .attr('dy', '.35em')
-        .attr('transform', 'rotate(45)')
-        .style('text-anchor', 'start');
+    const zAxis = d3
+      .scaleLinear()
+      .domain([calcTotalDeaths().min.TotalDeaths, calcTotalDeaths().max.TotalDeaths])
+      .range([1, 70]);
 
-      svg.append('g').call(d3.axisLeft(yAxis)).style('font-size', '18px');
+    svg
+      .append('g')
+      .attr('transform', 'translate(0,' + height + ')')
+      .call(d3.axisBottom(xAxis))
+      .style('font-size', '18px')
+      .selectAll('text')
+      .attr('y', 0)
+      .attr('x', 9)
+      .attr('dy', '.35em')
+      .attr('transform', 'rotate(45)')
+      .style('text-anchor', 'start');
 
-      const showCountryData = (
-        event: any,
-        { Continent, Country, TotalCases, TotalDeaths, TotalTests }: DataResponse
-      ) => {
-        updateCurrentCountry({ Continent, Country, Population, TotalCases, TotalDeaths, TotalTests });
-      };
+    svg.append('g').call(d3.axisLeft(yAxis)).style('font-size', '18px');
 
-      svg
-        .append('text')
-        .attr('x', width / 2)
-        .attr('y', height + 100)
-        .text('Total cases')
-        .style('font-size', '20px');
+    svg
+      .append('text')
+      .attr('x', width / 2)
+      .attr('y', height + 100)
+      .text('Total cases')
+      .style('font-size', '20px');
 
-      svg
-        .append('text')
-        .attr('y', -140)
-        .attr('x', -(height / 2))
-        .text('Population')
-        .style('transform', 'rotate(-90deg)')
-        .style('font-size', '20px');
+    svg
+      .append('text')
+      .attr('y', -140)
+      .attr('x', -(height / 2))
+      .text('Population')
+      .style('transform', 'rotate(-90deg)')
+      .style('font-size', '20px');
 
-      // Setting up data
+    // Setting up data
 
-      const correctContinentColor = (currentContinent: DataResponse) => {
-        let continentColor = 'grey';
+    const correctContinentColor = (currentContinent: DataResponse) => {
+      let continentColor = '#000';
 
-        allContinents.forEach((continent) => {
-          if (continent.label === currentContinent.Continent) {
-            continentColor = continent.backgroundColor;
-          }
-          return continentColor;
-        });
-
+      allContinents.forEach((continent) => {
+        if (continent.label === currentContinent.Continent) {
+          continentColor = continent.backgroundColor;
+        }
         return continentColor;
-      };
+      });
 
-      // Tooltip
+      return continentColor;
+    };
 
-      svg
-        .selectAll('dot')
-        .data(data)
-        .join('circle')
-        .attr('class', 'bubbles')
-        .style('stroke', 'black')
-        .style('stroke-width', '1px')
-        .attr('cx', (d) => Math.abs(xAxis(d.TotalCases)))
-        .attr('cy', (d) => yAxis(d.Population))
-        .attr('r', (d) => Math.abs(zAxis(d.TotalDeaths)))
-        .style('fill', (d) => (inactiveContinent.includes(d.Continent) ? '#CBCFD' : correctContinentColor(d)))
-        .on('mouseover', showCountryData);
-    },
+    svg
+      .selectAll('dot')
+      .data(data)
+      .join('circle')
+      .attr('class', 'bubbles')
+      .style('stroke', 'black')
+      .style('stroke-width', '2px')
+      .style('cursor', 'pointer')
+      .attr('cx', (d) => Math.abs(xAxis(d.TotalCases)))
+      .attr('cy', (d) => yAxis(d.Population))
+      .attr('r', (d) => Math.abs(zAxis(d.TotalDeaths)))
+      .style('fill', (d) => (inactiveContinent.includes(d.Continent) ? '#000' : correctContinentColor(d)))
+      .on('click', showCurrentCountryData);
+  };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [width, height, dataCovid, inactiveContinent, updateCurrentCountry]
-  );
   const generateKey = () => {
     return uuidv4();
   };
 
   useEffect(() => {
-    if (dataCovid.length !== 0) drawScatterChart(dataCovid);
-  }, [dataCovid, drawScatterChart]);
+    if (dataCovid.length !== 0) {
+      drawScatterChart(dataCovid);
+    }
+  }, [currentCountryRef, dataCovid, drawScatterChart]);
 
   return (
     <Box
       sx={{
-        m: 5,
+        m: 10,
         flex: 3,
         display: 'flex',
         justifyContent: 'center',

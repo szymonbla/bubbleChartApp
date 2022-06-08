@@ -22,12 +22,13 @@ export const ChartLegend = ({ inactiveContinents, setInactiveContinents }: Chart
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 4,
-        mb: 5,
-        maxWidth: '800px'
+        maxWidth: '500px'
       }}
     >
-      <Typography variant="h1">World Covid Tracker - LIVE</Typography>
-      <Typography variant="subtitle1">
+      <Typography variant="h1" sx={{ textAlign: 'center' }}>
+        World Covid Tracker - LIVE
+      </Typography>
+      <Typography variant="subtitle1" sx={{ textAlign: 'center' }}>
         It shows relevant and up-to-date data about covid-19 all over the world.
       </Typography>
       <Typography variant="subtitle1">

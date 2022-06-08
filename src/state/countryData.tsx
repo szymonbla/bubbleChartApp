@@ -3,12 +3,12 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 
 interface CurrentCountryState {
-  Country: string;
-  Population: number;
-  TotalCases: number;
-  TotalDeaths: number;
-  TotalTests: number;
-  Continent: string;
+  Country?: string;
+  Population?: number;
+  TotalCases?: number;
+  TotalDeaths?: number;
+  TotalTests?: number;
+  Continent?: string;
 }
 
 interface CurrentCountryFuntions {
