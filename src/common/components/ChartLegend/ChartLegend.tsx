@@ -23,7 +23,7 @@ export const ChartLegend = ({ inactiveContinents, setInactiveContinents }: Chart
         flexWrap: 'wrap',
         gap: 4,
         mb: 5,
-        width: '1050px'
+        maxWidth: '800px'
       }}
     >
       <Typography variant="h1">World Covid Tracker - LIVE</Typography>
@@ -34,9 +34,10 @@ export const ChartLegend = ({ inactiveContinents, setInactiveContinents }: Chart
         <b>Axis X</b> - Total cases <br></br> <b>Axis Y</b> - Population <br></br> <b>Axis Z</b> - Death Cases
       </Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4 }}>
-        {allContinents.map(({ label, id }) => (
+        {allContinents.map(({ label, id, backgroundColor }) => (
           <ChartButton
             key={id}
+            bgColor={backgroundColor}
             label={label}
             inactiveContinents={inactiveContinents}
             setInactiveContinents={setInactiveContinents}

@@ -4,11 +4,12 @@ import { Button } from '@mui/material';
 
 interface ChartButtonProps {
   label: string;
+  bgColor: string;
   inactiveContinents: string[];
   setInactiveContinents: Dispatch<React.SetStateAction<string[]>>;
 }
 
-export const ChartButton = ({ label, inactiveContinents, setInactiveContinents }: ChartButtonProps) => {
+export const ChartButton = ({ label, inactiveContinents, bgColor, setInactiveContinents }: ChartButtonProps) => {
   const [isActiveContinent, setIsActiveContinent] = useState<boolean>(true);
 
   const addContinent = (continentLabel: string) => {
@@ -33,13 +34,13 @@ export const ChartButton = ({ label, inactiveContinents, setInactiveContinents }
   return (
     <Button
       sx={{
-        backgroundColor: isActiveContinent ? 'info.main' : 'grey.600',
+        backgroundColor: isActiveContinent ? `${bgColor}` : 'grey.600',
         color: 'common.white',
         fontSize: '16px',
         fontWeight: '600',
         width: '200px',
         '&:hover': {
-          backgroundColor: isActiveContinent ? 'info.main' : 'grey.600'
+          backgroundColor: isActiveContinent ? `${bgColor}` : 'grey.600'
         }
       }}
       onClick={() => handleClick()}
