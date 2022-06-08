@@ -1,13 +1,18 @@
-import { useRef, useEffect, LegacyRef, useCallback, useState } from 'react';
+import { useRef, useEffect, LegacyRef, useCallback, useState, Dispatch } from 'react';
 
 import { Box } from '@mui/material';
 import * as d3 from 'd3';
+import { allContinents } from 'common/constants';
+import { v4 as uuidv4 } from 'uuid';
+import { useCurrentCountry } from 'state';
 
 interface DataResponse {
+  Id: number;
   Country: string;
   Population: number;
   TotalCases: number;
   TotalDeaths: number;
+  TotalTests: number;
   Continent: string;
 }
 
@@ -16,11 +21,12 @@ interface ScatterChartProps {
   height: number;
   dataCovid: DataResponse[];
   inactiveContinent: string[];
+  setCurrentCountry: Dispatch<React.SetStateAction<string>>;
 }
 
-export const ScatterChart = ({ dataCovid, height, width, inactiveContinent }: ScatterChartProps) => {
+export const ScatterChart = ({ dataCovid, height, width, inactiveContinent, setCurrentCountry }: ScatterChartProps) => {
   const svgRef = useRef<LegacyRef<SVGSVGElement>>();
-  const [id, setId] = useState<number>(1);
+  const { updateCurrentCountry, Population } = useCurrentCountry();
 
   const drawScatterChart = useCallback(
     (data: DataResponse[]) => {
@@ -56,34 +62,6 @@ export const ScatterChart = ({ dataCovid, height, width, inactiveContinent }: Sc
         .attr('height', height)
         .style('overflow', 'visible');
 
-      // Tooltip
-
-      const tooltip = d3
-        .select(svgRef.current as unknown as SVGSVGElement)
-        .append('div')
-        .style('opacity', 0)
-        .attr('class', 'tooltip')
-        .style('background-color', 'black')
-        .style('border-radius', '5px')
-        .style('padding', '10px')
-        .style('color', 'white');
-
-      const showTooltip = (event: MouseEvent, d: DataResponse) => {
-        tooltip.transition().duration(200);
-        tooltip
-          .style('opacity', 1)
-          .html('Country: ' + d.Country)
-          .style('left', event.x / 2 + 'px')
-          .style('top', event.y / 2 + 30 + 'px');
-      };
-
-      const moveTooltip = (event: MouseEvent) => {
-        tooltip.style('left', event.x / 2 + 'px').style('top', event.y / 2 + 30 + 'px');
-      };
-      const hideTooltip = () => {
-        tooltip.transition().duration(200).style('opacity', 0);
-      };
-
       // Axises
 
       const yAxis = d3.scaleLinear().domain([minPopulation().min, minPopulation().max]).range([height, 0]);
@@ -93,7 +71,7 @@ export const ScatterChart = ({ dataCovid, height, width, inactiveContinent }: Sc
       const zAxis = d3
         .scaleLinear()
         .domain([calcTotalDeaths().min.TotalDeaths, calcTotalDeaths().max.TotalDeaths])
-        .range([1, 50]);
+        .range([1, 70]);
 
       svg
         .append('g')
@@ -109,7 +87,13 @@ export const ScatterChart = ({ dataCovid, height, width, inactiveContinent }: Sc
 
       svg.append('g').call(d3.axisLeft(yAxis)).style('font-size', '18px');
 
-      // axis label
+      const showCountryData = (
+        event: any,
+        { Continent, Country, TotalCases, TotalDeaths, TotalTests }: DataResponse
+      ) => {
+        updateCurrentCountry({ Continent, Country, Population, TotalCases, TotalDeaths, TotalTests });
+      };
+
       svg
         .append('text')
         .attr('x', width / 2)
@@ -125,40 +109,59 @@ export const ScatterChart = ({ dataCovid, height, width, inactiveContinent }: Sc
         .style('transform', 'rotate(-90deg)')
         .style('font-size', '20px');
 
-      // setting up data
+      // Setting up data
+
+      const correctContinentColor = (currentContinent: DataResponse) => {
+        let continentColor = 'grey';
+
+        allContinents.forEach((continent) => {
+          if (continent.label === currentContinent.Continent) {
+            continentColor = continent.backgroundColor;
+          }
+          return continentColor;
+        });
+
+        return continentColor;
+      };
+
+      // Tooltip
+
       svg
         .selectAll('dot')
         .data(data)
         .join('circle')
+        .attr('class', 'bubbles')
+        .style('stroke', 'black')
+        .style('stroke-width', '1px')
         .attr('cx', (d) => Math.abs(xAxis(d.TotalCases)))
         .attr('cy', (d) => yAxis(d.Population))
         .attr('r', (d) => Math.abs(zAxis(d.TotalDeaths)))
-        .style('fill', (d) => (inactiveContinent.includes(d.Continent) ? '#CBCFD' : `#f3f343`))
-        // .style('fill', () => `#${Math.floor(Math.random() * 16777215).toString(16)}`)
-        .style('opacity', '1')
-        .on('mouseover', showTooltip)
-        .on('mousemove', moveTooltip)
-        .on('mouseleave', hideTooltip);
+        .style('fill', (d) => (inactiveContinent.includes(d.Continent) ? '#CBCFD' : correctContinentColor(d)))
+        .on('mouseover', showCountryData);
     },
-    [width, height, dataCovid, inactiveContinent]
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [width, height, dataCovid, inactiveContinent, updateCurrentCountry]
   );
+  const generateKey = () => {
+    return uuidv4();
+  };
 
   useEffect(() => {
     if (dataCovid.length !== 0) drawScatterChart(dataCovid);
-    setId(id + 1);
-  }, [dataCovid, drawScatterChart, id]);
+  }, [dataCovid, drawScatterChart]);
 
   return (
     <Box
       sx={{
         m: 5,
-        flex: 2,
+        flex: 3,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
       }}
     >
-      <svg ref={svgRef as LegacyRef<SVGSVGElement>} key={id}></svg>
+      <svg ref={svgRef as LegacyRef<SVGSVGElement>} key={generateKey()}></svg>
     </Box>
   );
 };
