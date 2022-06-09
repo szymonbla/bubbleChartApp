@@ -1,5 +1,6 @@
 {
-  "name": "ubble-chart-app",
+  "name": "bubble-chart-app",
+  "homepage": "https://szymonbla.github.io/bubbleChartApp",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,6 +16,7 @@
     "@types/react-dom": "^18.0.0",
     "axios": "^0.27.2",
     "d3": "^7.4.4",
+    "gh-pages": "^4.0.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-scripts": "5.0.1",
@@ -28,7 +30,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint 'src/*.{js,jsx,ts,tsx}' --fix --max-warnings 0",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
