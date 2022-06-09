@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.js": "/bubbleChartApp/static/js/main.5b3e8e3a.js",
+    "static/js/787.6daabcc8.chunk.js": "/bubbleChartApp/static/js/787.6daabcc8.chunk.js",
+    "index.html": "/bubbleChartApp/index.html",
+    "main.5b3e8e3a.js.map": "/bubbleChartApp/static/js/main.5b3e8e3a.js.map",
+    "787.6daabcc8.chunk.js.map": "/bubbleChartApp/static/js/787.6daabcc8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.5b3e8e3a.js"
+  ]
+}
